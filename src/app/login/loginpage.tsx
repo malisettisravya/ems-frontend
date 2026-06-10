@@ -29,24 +29,35 @@ export default function LoginPage() {
       setError("");
 
       const response = await axios.post(
-        "http://localhost:5000/auth/login", //
+        "http://localhost:5000/auth/login",
         formData
       );
 
       console.log("Login Success:", response.data);
 
-      // Example: store token
+      // Store token
       localStorage.setItem("token", response.data.token);
 
-      // Example: redirect
-      // router.push("/dashboard");
+      // ✅ Get user from backend response
+      const role = response.data.role;
+
+alert(
+  role === "admin"
+    ? "Welcome Admin 👑"
+    : "Welcome Employee 👨‍💼"
+);
+
+      // Optional: Redirect
+      // if (user.role === "admin") {
+      //   router.push("/admin/dashboard");
+      // } else {
+      //   router.push("/employee/dashboard");
+      // }
 
     } catch (err: any) {
       console.log("Login Error:", err);
 
-      setError(
-        err.response?.data?.message || "Something went wrong"
-      );
+      setError(err.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -111,21 +122,21 @@ export default function LoginPage() {
 
         <div className="relative z-10 max-w-md text-center space-y-8 px-6">
           <div>
-            <h2 className="text-xl font-semibold">Role-Based Access</h2>
+            <h1 className="text-xl font-semibold">Role-Based Access</h1>
             <p className="text-sm text-gray-200">
               Admins manage employees, users access personal dashboards.
             </p>
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold">Employee Management</h2>
+            <h1 className="text-xl font-semibold">Employee Management</h1>
             <p className="text-sm text-gray-200">
               Track employee data, roles, and performance efficiently.
             </p>
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold">Secure System</h2>
+            <h1 className="text-xl font-semibold">Secure System</h1>
             <p className="text-sm text-gray-200">
               Authentication ensures protected access to company data.
             </p>
