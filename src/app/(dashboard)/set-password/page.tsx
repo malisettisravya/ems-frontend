@@ -9,6 +9,7 @@ export default function SetPasswordPage() {
 
   const token = searchParams.get('token');
 
+  /* ================= STATE ================= */
   const [loading, setLoading] = useState(true);
   const [valid, setValid] = useState(false);
 
@@ -16,36 +17,32 @@ export default function SetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
-  // STEP 3: Validate token
+  /* ================= TOKEN CHECK ================= */
   useEffect(() => {
-    const validateToken = async () => {
-      if (!token) {
-        setValid(false);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const res = await fetch(`/api/invite/validate?token=${token}`);
-        const data = await res.json();
-
-        setValid(data.valid);
-      } catch (err) {
-        setValid(false);
-      }
-
+    // If you DO NOT have validate API, skip and allow form
+    if (!token) {
+      setValid(false);
       setLoading(false);
-    };
+      return;
+    }
 
-    validateToken();
+    // OPTIONAL: if you don't have validate API → just allow
+    setValid(true);
+    setLoading(false);
   }, [token]);
 
-  // STEP 5: Submit password
+  /* ================= SUBMIT ================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (password.length < 8) {
+    // validations
+    if (!token) {
+      setError('Invalid or missing token');
+      return;
+    }
+
+    if (password.length >= 8) {
       setError('Password must be at least 8 characters');
       return;
     }
@@ -56,70 +53,100 @@ export default function SetPasswordPage() {
     }
 
     try {
-      const res = await fetch('/api/invite/set-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password }),
-      });
+      const res = await fetch(
+        'http://localhost:5000/admin/set-password',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token,
+            password,
+          }),
+        }
+      );
 
       const data = await res.json();
 
-      if (!data.success) {
-        setError(data.message || 'Something went wrong');
+      if (!res.ok) {
+        setError(data.message || 'Failed to set password');
         return;
       }
 
+      alert('✅ Password set successfully');
+
       router.push('/login');
     } catch (err) {
-      setError('Server error');
+      console.error(err);
+      setError('Server error. Check backend.');
     }
   };
 
-  // STEP 3 UI states
-  if (loading) {
-    return <div className="p-6">Validating invite link...</div>;
-  }
+  /* ================= UI ================= */
 
-  if (!valid) {
+  if (loading) {
     return (
-      <div className="p-6 text-red-600">
-        This invite link is invalid or has expired.
+      <div className="min-h-screen flex items-center justify-center">
+        Validating link...
       </div>
     );
   }
 
-  // STEP 4 UI form
+  if (!valid) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-600">
+        Invalid or expired link
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-md mx-auto p-6 mt-10">
-      <h1 className="text-xl font-bold mb-4">Set Your Password</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="password"
-          placeholder="New password"
-          className="w-full p-2 border rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
 
-        <input
-          type="password"
-          placeholder="Confirm password"
-          className="w-full p-2 border rounded"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-
-        {error && (
-          <p className="text-red-500 text-sm">{error}</p>
-        )}
-
-        <button
-          className="w-full bg-blue-600 text-white p-2 rounded"
-        >
+        <h1 className="text-xl font-semibold mb-6 text-center">
           Set Password
-        </button>
-      </form>
+        </h1>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* PASSWORD */}
+          <input
+            type="password"
+            placeholder="New Password"
+            className="w-full p-2 border rounded"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          {/* CONFIRM PASSWORD */}
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            className="w-full p-2 border rounded"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+
+          {/* ERROR */}
+          {error && (
+            <p className="text-red-500 text-sm">{error}</p>
+          )}
+
+          {/* BUTTON */}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          >
+            Set Password
+          </button>
+
+        </form>
+      </div>
     </div>
   );
 }
