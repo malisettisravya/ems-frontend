@@ -132,9 +132,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">
-            Welcome back, Admin 👋
-          </h1>
+
           <p className="text-gray-500 text-sm">
             Here’s what’s happening with your team today
           </p>

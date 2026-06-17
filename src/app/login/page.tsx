@@ -79,7 +79,7 @@ if (role === "admin") {
           {/* LOGO + BRAND */}
 <div className="mb-10 flex items-center justify-center gap-3">
   
-  <h1 className="text-2xl font-semibold text-gray-800 tracking-wide">
+  <h1 className="text-4xl font-semibold text-gray-800 tracking-wide">
     Ryzer
   </h1>
 </div>
@@ -120,9 +120,7 @@ if (role === "admin") {
             )}
           </form>
 
-          <p className="text-sm text-gray-400 mt-6">
-            Admin & Employees have different access levels
-          </p>
+          
         </div>
       </div>
 
