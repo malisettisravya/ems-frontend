@@ -86,7 +86,7 @@ export default function DashboardPage() {
       <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900">
-            Welcome back, John! 👋
+            Welcome back 👋
           </h1>
           <p className="text-sm text-slate-500">
             Here&apos;s what&apos;s happening today.
@@ -180,7 +180,8 @@ export default function DashboardPage() {
         </div>
 
         {/* My Attendance Calendar Panel */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border flex flex-col justify-between">
+       {/* My Attendance Calendar Panel */}
+<div className="bg-white p-6 rounded-2xl shadow-sm border">
   <AttendanceCalendar />
 </div>
        
