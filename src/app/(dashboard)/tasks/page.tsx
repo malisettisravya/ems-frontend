@@ -96,7 +96,7 @@ export default function TodayAttendance() {
               <tr key={index} className="border-b">
                 {/* Employee */}
                 <td className="p-2">
-                  {emp.employeeId?.fullName || "N/A"}
+                  {emp.employee?.fullName }
                 </td>
 
                 {/* Date */}
