@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
+import { toast } from "sonner"; // ✅ FIXED
 import api from "@/lib/api";
 
 export default function RegisterFace() {
@@ -43,16 +44,19 @@ export default function RegisterFace() {
       .withFaceDescriptor();
 
     if (!detection) {
-      alert("No face detected");
+      toast.error("No face detected ❌");
       return;
     }
 
     setDescriptor(Array.from(detection.descriptor));
-    alert("Face captured successfully ✅");
-  };
+    toast.success("Face captured successfully ✅");
+  }; // ✅ FIXED (missing closing brace earlier)
 
   const registerFace = async () => {
-    if (!descriptor) return;
+    if (!descriptor) {
+      toast.error("Please capture face first");
+      return;
+    }
 
     setLoading(true);
 
@@ -81,11 +85,11 @@ export default function RegisterFace() {
         },
       });
 
-      alert("Face registered successfully 🎉");
+      toast.success("Face registered successfully 🎉"); // ✅ replaced alert
       setDescriptor(null);
     } catch (err) {
       console.log(err);
-      alert("Error registering face");
+      toast.error("Error registering face ❌"); // ✅ replaced alert
     }
 
     setLoading(false);

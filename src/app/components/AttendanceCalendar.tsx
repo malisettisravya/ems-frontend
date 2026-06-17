@@ -10,32 +10,32 @@ export default function AttendanceCalendar() {
   const year = today.getFullYear();
   const month = today.getMonth() + 1;
 
- useEffect(() => {
-  const fetchAttendance = async () => {
-    try {
-      const token = localStorage.getItem("token");
+  useEffect(() => {
+    const fetchAttendance = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-      console.log("TOKEN =>", token);
+        console.log("TOKEN =>", token);
 
-      const res = await api.get(
-        `/attendance/monthly?month=${month}&year=${year}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+        const res = api.get(
+          `/attendance/monthly?month=${month}&year=${year}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      console.log("Attendance Response:", res.data);
+        console.log("Attendance Response:", res.data);
 
-      setAttendance(res.data.calendar || []);
-    } catch (error) {
-      console.error("Attendance fetch error:", error);
-    }
-  };
+        setAttendance(res.data.calendar || []);
+      } catch (error) {
+        console.error("Attendance fetch error:", error);
+      }
+    };
 
-  fetchAttendance();
-}, [month, year]);
+    fetchAttendance();
+  }, [month, year]);
 
   const attendanceMap = useMemo(() => {
     const map: Record<number, string> = {};
@@ -63,17 +63,19 @@ export default function AttendanceCalendar() {
   }
 
   return (
-    <div className="bg-white rounded-xl p-5 shadow-sm">
-      <h2 className="font-bold text-2xl mb-6">
-        My Attendance (
-        {today.toLocaleString("default", {
-          month: "long",
-        })}{" "}
-        {year})
-      </h2>
+    <div className="w-full max-w-md mx-auto bg-white rounded-2xl border border-gray-100 p-6 shadow-sm tracking-tight">
+      {/* Header Section */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="font-bold text-xl text-gray-900">
+            {today.toLocaleString("default", { month: "long" })} {year}
+          </h2>
+          <p className="text-xs text-gray-400 mt-0.5">My Attendance Logs</p>
+        </div>
+      </div>
 
-      {/* Week Days */}
-      <div className="grid grid-cols-7 text-center font-semibold text-gray-500 mb-5">
+      {/* Week Days Headers */}
+      <div className="grid grid-cols-7 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
         <div>Mon</div>
         <div>Tue</div>
         <div>Wed</div>
@@ -83,10 +85,10 @@ export default function AttendanceCalendar() {
         <div>Sun</div>
       </div>
 
-      {/* Calendar */}
-      <div className="grid grid-cols-7 gap-y-5 text-center">
+      {/* Calendar Grid */}
+      <div className="grid grid-cols-7 gap-2 text-center">
         {days.map((day, index) => {
-          if (!day) return <div key={index}></div>;
+          if (!day) return <div key={index} className="aspect-square"></div>;
 
           const status = attendanceMap[day];
 
@@ -95,53 +97,46 @@ export default function AttendanceCalendar() {
             month === today.getMonth() + 1 &&
             year === today.getFullYear();
 
+          // Define dynamic status layouts with refined design tokens
+          let statusClasses = "text-gray-700 hover:bg-gray-50";
+          let dotColor = "";
+
+          if (status === "present") {
+            statusClasses = "bg-emerald-50 text-emerald-700 font-semibold border border-emerald-100";
+            dotColor = "bg-emerald-500";
+          } else if (status === "leave") {
+            statusClasses = "bg-rose-50 text-rose-700 font-semibold border border-rose-100";
+            dotColor = "bg-rose-500";
+          }
+
+          // Accent ring layout for the current day
+          const todayClasses = isToday 
+            ? "ring-2 ring-indigo-500 ring-offset-2 z-10 shadow-sm" 
+            : "";
+
           return (
             <div
               key={index}
-              className={`flex flex-col items-center justify-center p-1 rounded-md ${
-                isToday
-                  ? "bg-indigo-100 border border-indigo-400"
-                  : ""
-              }`}
+              className={`aspect-square flex flex-col items-center justify-center relative rounded-xl transition-all duration-200 text-sm ${statusClasses} ${todayClasses}`}
             >
-              {/* Present */}
-              {status === "present" ? (
-                <>
-                  <span className="text-green-600 font-bold">
-                    {day}
-                  </span>
-                  <span className="w-2 h-2 bg-green-500 rounded-full mt-1"></span>
-                </>
-              ) : status === "leave" ? (
-                <>
-                  {/* Leave */}
-                  <span className="text-red-500 font-bold">
-                    {day}
-                  </span>
-                  <span className="w-2 h-2 bg-red-500 rounded-full mt-1"></span>
-                </>
-              ) : (
-                <>
-                  {/* Default */}
-                  <span className="text-gray-700">
-                    {day}
-                  </span>
-                </>
+              <span>{day}</span>
+              {dotColor && (
+                <span className={`w-1.5 h-1.5 ${dotColor} rounded-full absolute bottom-2`}></span>
               )}
             </div>
           );
         })}
       </div>
 
-      {/* Legend */}
-      <div className="flex gap-6 mt-8 pt-4 border-t">
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+      {/* Modern Compact Legend */}
+      <div className="flex gap-4 mt-6 pt-5 border-t border-gray-100 justify-start text-xs font-medium text-gray-500">
+        <div className="flex items-center gap-2 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+          <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
           <span>Present</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+        <div className="flex items-center gap-2 px-2.5 py-1 bg-rose-50 text-rose-700 rounded-full border border-rose-100">
+          <span className="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
           <span>Leave</span>
         </div>
       </div>

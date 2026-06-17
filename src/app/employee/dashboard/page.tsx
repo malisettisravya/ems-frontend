@@ -83,16 +83,8 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-slate-50/60 p-4 md:p-8 font-sans text-slate-800">
 
       {/* Header */}
-      <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">
-            Welcome back, John! 👋
-          </h1>
-          <p className="text-sm text-slate-500">
-            Here&apos;s what&apos;s happening today.
-          </p>
-        </div>
-      </div>
+      
+    
 
       {/* Metrics Row */}
       <div className="mb-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
