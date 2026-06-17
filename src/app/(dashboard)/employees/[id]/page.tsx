@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import {toast} from "sonner";
 
 type EmployeeForm = {
   fullName: string;
@@ -108,13 +109,13 @@ export default function EditEmployeePage() {
         }
       );
 
-      alert("✅ Employee updated successfully");
+      toast.success("✅ Employee updated successfully");
 
       setOriginalForm(form);
       setIsEditing(false);
     } catch (err: any) {
       console.error("UPDATE ERROR:", err.response?.data || err.message);
-      alert("❌ Update failed");
+      toast.error("❌ Update failed");
     } finally {
       setSaving(false);
     }

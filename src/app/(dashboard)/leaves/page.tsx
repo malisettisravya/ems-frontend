@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import {toast} from "sonner";
 
 const BASE_URL = "http://localhost:5000/leave/admin";
 
@@ -59,7 +60,8 @@ export default function LeaveRequestsPage() {
       console.error("Fetch error:", err);
 
       if (err.response?.status === 403) {
-        alert("Access denied: Admin only");
+    
+        toast.error("Access denied:Admin only");
       }
     } finally {
       setLoading(false);
@@ -93,7 +95,7 @@ export default function LeaveRequestsPage() {
       console.error("Update error:", err);
 
       if (err.response?.status === 403) {
-        alert("Only admin can update status");
+        toast.error("Only admin can update status");
       }
     }
   };

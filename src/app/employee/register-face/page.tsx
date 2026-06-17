@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
-import { toast } from "sonner"; // ✅ FIXED
+import { toast } from "sonner"; 
 import api from "@/lib/api";
 
 export default function RegisterFace() {
@@ -85,11 +85,11 @@ export default function RegisterFace() {
         },
       });
 
-      toast.success("Face registered successfully 🎉"); // ✅ replaced alert
+      toast.success("Face registered successfully 🎉"); 
       setDescriptor(null);
     } catch (err) {
       console.log(err);
-      toast.error("Error registering face ❌"); // ✅ replaced alert
+      toast.error("Error registering face ❌"); 
     }
 
     setLoading(false);

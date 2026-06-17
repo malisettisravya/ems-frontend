@@ -2,6 +2,7 @@
 
 import { useEffect, useState, ChangeEvent } from "react";
 import axios from "axios";
+import {toast} from "sonner";
 
 /* ---------------- ENUM TYPES (MATCH BACKEND) ---------------- */
 type EmploymentType = "FULL_TIME" | "PART_TIME" | "INTERN";
@@ -89,10 +90,10 @@ export default function EmployeeProfile() {
       );
 
       setEditMode(false);
-      alert("Updated successfully");
+      toast.success("Updated successfully");
     } catch (err) {
       console.error(err);
-      alert("Update failed");
+      toast.error("Update failed");
     } finally {
       setLoading(false);
     }

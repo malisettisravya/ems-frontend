@@ -6,20 +6,34 @@ import axios from "axios";
 type Attendance = {
   date: string;
   status: "PRESENT" | "LEAVE";
+  checkInTime?: string; // ✅ added
   employeeId: {
     fullName: string;
   };
 };
 
+
 export default function TodayAttendance() {
   const [todayList, setTodayList] = useState<Attendance[]>([]);
-  const [todayFormatted, setTodayFormatted] = useState(""); // ✅ Fix hydration
+  const [todayFormatted, setTodayFormatted] = useState("");
+
+  // ✅ Helper function (clean & reusable)
+  const formatTime = (time?: string) => {
+    if (!time) return "Not Checked In";
+
+    const date = new Date(time);
+    if (isNaN(date.getTime())) return "Invalid Time";
+
+    return date.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
 
   useEffect(() => {
-    // ✅ Set date ONLY on client (avoids hydration mismatch)
-    setTodayFormatted(
-      new Date().toLocaleDateString("en-GB") // fixed format
-    );
+    // ✅ Avoid hydration mismatch
+    setTodayFormatted(new Date().toLocaleDateString("en-GB"));
 
     const fetchAttendance = async () => {
       try {
@@ -39,12 +53,13 @@ export default function TodayAttendance() {
           }
         );
 
+        console.log("API DATA:", res.data); // ✅ debug
+
         const today = new Date().toISOString().split("T")[0];
 
-        const filtered = res.data.filter(
-          (item: Attendance) =>
-            item.date.split("T")[0] === today
-        );
+        const filtered = res.data.filter((item: Attendance) => {
+          return item.date?.split("T")[0] === today;
+        });
 
         setTodayList(filtered);
       } catch (err: any) {
@@ -59,6 +74,7 @@ export default function TodayAttendance() {
   }, []);
 
   return (
+    
     <div className="p-6 bg-white rounded-xl shadow">
       <h2 className="text-lg font-semibold mb-4">
         Today's Attendance ({todayFormatted})
@@ -70,6 +86,7 @@ export default function TodayAttendance() {
             <th className="p-2">Employee</th>
             <th className="p-2">Date</th>
             <th className="p-2">Status</th>
+            <th className="p-2">Check In</th>
           </tr>
         </thead>
 
@@ -101,16 +118,22 @@ export default function TodayAttendance() {
                       : "🟡 Leave"}
                   </span>
                 </td>
+
+                {/* ✅ Check In Time */}
+               <td className="p-2">
+  {emp.checkInTime || "Not Checked In"}
+</td>
               </tr>
             ))
           ) : (
             <tr>
               <td
-                colSpan={3}
+                colSpan={4} // ✅ fixed (was 3)
                 className="text-center p-4 text-gray-500"
               >
                 No attendance records for today
               </td>
+              console.log("checkInTime:", emp.checkInTime);
             </tr>
           )}
         </tbody>

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import {toast} from "sonner";
 
 /* =========================================================
    📌 ENUM OPTIONS (MUST MATCH BACKEND EXACTLY)
@@ -119,7 +120,7 @@ export default function AddEmployeeForm() {
 
       console.log('✅ Employee Created:', res.data);
 
-      alert('Employee added successfully & email sent!');
+      toast.success('Employee added successfully & email sent!');
 
       // reset form after success
       setFormData({
@@ -135,7 +136,7 @@ export default function AddEmployeeForm() {
     } catch (error: any) {
       console.error('❌ API Error:', error);
 
-      alert(
+      toast.error(
         error?.response?.data?.message ||
           'Failed to add employee. Please check backend.'
       );

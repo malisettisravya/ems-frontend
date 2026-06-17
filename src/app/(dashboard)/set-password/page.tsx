@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import {toast} from "sonner";
 
 export default function SetPasswordPage() {
   const searchParams = useSearchParams();
@@ -42,7 +43,7 @@ export default function SetPasswordPage() {
       return;
     }
 
-    if (password.length >= 8) {
+    if (password.length < 8) {
       setError('Password must be at least 8 characters');
       return;
     }
@@ -63,6 +64,7 @@ export default function SetPasswordPage() {
           body: JSON.stringify({
             token,
             password,
+            confirmPassword,
           }),
         }
       );
@@ -74,7 +76,7 @@ export default function SetPasswordPage() {
         return;
       }
 
-      alert('✅ Password set successfully');
+      toast.success('✅ Password set successfully');
 
       router.push('/login');
     } catch (err) {

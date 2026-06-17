@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Eye } from "lucide-react";
+import {toast} from "sonner";
 
 /* ---------------- BASE CONFIG ---------------- */
 const BASE_URL = "http://localhost:5000/admin";
@@ -70,7 +71,7 @@ export default function EmployeesPage() {
       setEmployees((prev) => prev.filter((e) => e._id !== id));
     } catch (err) {
       console.error("Delete failed:", err);
-      alert("Failed to delete employee");
+      toast.error("Failed to delete employee");
     }
   };
 

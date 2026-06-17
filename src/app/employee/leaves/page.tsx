@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import axios from "axios";
+import {toast} from "sonner";
 
 interface LeaveRequestPayload {
   reason: string;
@@ -72,7 +73,7 @@ export default function ApplyLeave() {
       }
     );
 
-    alert("Leave applied!");
+    toast.success("Leave applied!");
   };
 
   return (
