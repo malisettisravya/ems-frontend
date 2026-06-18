@@ -170,19 +170,11 @@ export default function LeaveRequestsPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="border px-3 py-2 rounded w-1/3"
         />
+        </div>
 
-        <select
-          value={leaveType}
-          onChange={(e) => setLeaveType(e.target.value)}
-          className="border px-3 py-2 rounded"
-        >
-          <option value="all">All Leave Types</option>
-          <option value="sick">Sick Leave</option>
-          <option value="casual">Casual Leave</option>
-        </select>
-      </div>
-
+      
       {/* ---------------- TABLE ---------------- */}
+      
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {loading ? (
           <p className="p-4">Loading...</p>
@@ -191,7 +183,6 @@ export default function LeaveRequestsPage() {
             <thead className="bg-gray-100 text-sm">
               <tr>
                 <th className="p-3">Employee</th>
-                <th className="p-3">Leave Type</th>
                 <th className="p-3">From</th>
                 <th className="p-3">To</th>
                 <th className="p-3">Reason</th>
@@ -200,63 +191,71 @@ export default function LeaveRequestsPage() {
               </tr>
             </thead>
 
-            <tbody>
-              {filteredLeaves.map((leave) => (
-                <tr key={leave._id} className="border-t">
-                  <td className="p-3">
-                    {leave.employeeDetails?.email || "-"}
-                  </td>
+           <tbody>
+  {filteredLeaves.map((leave) => {
+    const isFinalized =
+      leave.Leavestatus === "approved" ||
+      leave.Leavestatus === "rejected";
 
-                  <td className="p-3">{leave.reason || "-"}</td>
+    return (
+      <tr key={leave._id} className="border-t">
+        <td className="p-3">
+          {leave.employeeDetails?.email || "-"}
+        </td>
 
-                  <td className="p-3">
-                    {formatDate(leave.fromDate)}
-                  </td>
 
-                  <td className="p-3">
-                    {formatDate(leave.toDate)}
-                  </td>
+        <td className="p-3">
+          {formatDate(leave.fromDate)}
+        </td>
 
-                  <td className="p-3">{leave.reason || "-"}</td>
+        <td className="p-3">
+          {formatDate(leave.toDate)}
+        </td>
 
-                  <td className="p-3">
-                    <span
-                      className={`px-2 py-1 text-xs rounded ${getStatusStyle(
-                        leave.Leavestatus
-                      )}`}
-                    >
-                      {leave.Leavestatus || "pending"}
-                    </span>
-                  </td>
+        <td className="p-3">{leave.reason || "-"}</td>
 
-                  <button
-  type="button"
-  onClick={() => updateStatus(leave._id, "approved")}
-  disabled={leave.Leavestatus === "approved"}
-  className="bg-green-500 text-white px-3 py-1 rounded disabled:opacity-40"
->
-  ✓
-</button>
+      
 
-<button
-  type="button"
-  onClick={() => updateStatus(leave._id, "reject")}
-  disabled={leave.Leavestatus === "reject"}
-  className="bg-red-500 text-white px-3 py-1 rounded disabled:opacity-40"
->
-  ✕
-</button>
-                </tr>
-              ))}
+        <td className="p-3">
+          <span
+            className={`px-2 py-1 text-xs rounded ${getStatusStyle(
+              leave.Leavestatus
+            )}`}
+          >
+            {leave.Leavestatus || "pending"}
+          </span>
+        </td>
 
-              {filteredLeaves.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="text-center p-4">
-                    No leave requests
-                  </td>
-                </tr>
-              )}
-            </tbody>
+        {/* ✅ Actions column */}
+        <td className="p-3 text-center space-x-2">
+          <button
+            onClick={() => updateStatus(leave._id, "approved")}
+            disabled={isFinalized}
+            className="bg-green-500 text-white px-3 py-1 rounded disabled:opacity-40"
+          >
+            ✓
+          </button>
+
+          <button
+            onClick={() => updateStatus(leave._id, "rejected")}
+            disabled={isFinalized}
+            className="bg-red-500 text-white px-3 py-1 rounded disabled:opacity-40"
+          >
+            ✕
+          </button>
+        </td>
+      </tr>
+    );
+  })}
+
+  {filteredLeaves.length === 0 && (
+    <tr>
+      <td colSpan={7} className="text-center p-4">
+        No leave requests
+      </td>
+    </tr>
+  )}
+</tbody>
           </table>
         )}
       </div>
