@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 type EmployeeForm = {
   fullName: string;
@@ -19,6 +19,7 @@ type EmployeeForm = {
   dateOfBirth: string;
   address: string;
   gender: string;
+  profilePicture: string | null;
 };
 
 export default function EditEmployeePage() {
@@ -31,6 +32,8 @@ export default function EditEmployeePage() {
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  const BASE_URL = "http://localhost:5000";
+
   /* ================= FETCH ================= */
   useEffect(() => {
     if (!id) return;
@@ -40,7 +43,7 @@ export default function EditEmployeePage() {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          `http://localhost:5000/admin/employee/${id}`,
+          `${BASE_URL}/admin/employee/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -65,12 +68,20 @@ export default function EditEmployeePage() {
           dateOfBirth: formatDate(emp.dateOfBirth),
           address: emp.address || "",
           gender: emp.gender || "MALE",
+
+          // ✅ IMPORTANT FIX ONLY
+          profilePicture:
+            emp.profilePicture ||
+            emp.profile?.profilePicture ||
+            emp.image ||
+            null,
         };
 
         setForm(mappedData);
         setOriginalForm(mappedData);
       } catch (err) {
-        console.error("FETCH ERROR:", err);
+        console.error(err);
+        toast.error("Failed to load employee");
       } finally {
         setLoading(false);
       }
@@ -79,13 +90,21 @@ export default function EditEmployeePage() {
     fetchEmployee();
   }, [id]);
 
+  /* ================= IMAGE FIX (ONLY LOGIC FIX) ================= */
+  const imageUrl =
+    form?.profilePicture
+      ? form.profilePicture.startsWith("http")
+        ? form.profilePicture
+        : `${BASE_URL}${form.profilePicture}`
+      : null;
+
   /* ================= HANDLE CHANGE ================= */
   const handleChange = (e: any) => {
     if (!form) return;
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  /* ================= SAVE (PUT) ================= */
+  /* ================= SAVE ================= */
   const handleSave = async () => {
     if (!form) return;
 
@@ -94,34 +113,32 @@ export default function EditEmployeePage() {
     try {
       const token = localStorage.getItem("token");
 
-      const payload = {
-        ...form,
-        salary: Number(form.salary),
-        dateOfJoining: new Date(form.dateOfJoining),
-        dateOfBirth: form.dateOfBirth ? new Date(form.dateOfBirth) : null,
-      };
-
       await axios.put(
-        `http://localhost:5000/admin/employee/${id}`,
-        payload,
+        `${BASE_URL}/admin/employee/${id}`,
+        {
+          ...form,
+          salary: Number(form.salary),
+          dateOfJoining: new Date(form.dateOfJoining),
+          dateOfBirth: form.dateOfBirth
+            ? new Date(form.dateOfBirth)
+            : null,
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      toast.success("✅ Employee updated successfully");
+      toast.success("Employee updated successfully");
 
       setOriginalForm(form);
       setIsEditing(false);
-    } catch (err: any) {
-      console.error("UPDATE ERROR:", err.response?.data || err.message);
-      toast.error("❌ Update failed");
+    } catch (err) {
+      toast.error("Update failed");
     } finally {
       setSaving(false);
     }
   };
 
-  /* ================= CANCEL ================= */
   const handleCancel = () => {
     setForm(originalForm);
     setIsEditing(false);
@@ -130,14 +147,13 @@ export default function EditEmployeePage() {
   if (loading) return <p className="p-6">Loading...</p>;
   if (!form) return <p className="p-6">No employee data</p>;
 
-  /* ================= FIELD RENDER ================= */
+  /* ================= FIELD RENDER (UNCHANGED) ================= */
   const renderField = (label: string, name: keyof EmployeeForm) => (
     <div>
       <p className="text-gray-500 text-sm">{label}</p>
 
       {isEditing ? (
         name === "dateOfBirth" ? (
-          /* 📅 CALENDAR */
           <input
             type="date"
             name={name}
@@ -146,7 +162,6 @@ export default function EditEmployeePage() {
             className="border p-2 rounded w-full"
           />
         ) : name === "gender" ? (
-          /* 🔘 RADIO BUTTONS */
           <div className="flex gap-4 mt-1">
             {["MALE", "FEMALE", "OTHER"].map((g) => (
               <label key={g} className="flex items-center gap-1">
@@ -175,12 +190,12 @@ export default function EditEmployeePage() {
     </div>
   );
 
-  /* ================= UI ================= */
+  /* ================= UI (UNCHANGED) ================= */
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="max-w-5xl mx-auto bg-white rounded-xl shadow p-6">
 
-        {/* HEADER */}
+        {/* HEADER (UNCHANGED) */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-xl font-semibold">My Profile</h2>
@@ -218,10 +233,19 @@ export default function EditEmployeePage() {
 
         <div className="grid grid-cols-3 gap-6">
 
-          {/* LEFT PROFILE */}
+          {/* LEFT PROFILE (ONLY IMAGE FIXED) */}
           <div className="bg-gray-50 rounded-lg p-6 text-center">
-            <div className="w-24 h-24 mx-auto rounded-full bg-purple-200 flex items-center justify-center text-4xl">
-              👤
+
+            <div className="w-24 h-24 mx-auto rounded-full bg-purple-200 flex items-center justify-center text-4xl overflow-hidden">
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt="profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                "👤"
+              )}
             </div>
 
             <h3 className="mt-4 font-semibold text-lg">
@@ -237,9 +261,8 @@ export default function EditEmployeePage() {
             </div>
           </div>
 
-          {/* RIGHT DETAILS */}
+          {/* RIGHT DETAILS (UNCHANGED) */}
           <div className="col-span-2 grid grid-cols-2 gap-6">
-
             {renderField("Full Name", "fullName")}
             {renderField("Email", "email")}
             {renderField("Phone", "phoneNumber")}
@@ -255,8 +278,8 @@ export default function EditEmployeePage() {
 
             {renderField("Gender", "gender")}
             {renderField("Status", "status")}
-
           </div>
+
         </div>
       </div>
     </div>

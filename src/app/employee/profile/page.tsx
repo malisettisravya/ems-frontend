@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 
+/* ---------------- TYPE ---------------- */
 type Employee = {
   fullName: string;
   email: string;
@@ -24,6 +25,11 @@ type Employee = {
   gender?: string;
   employeeId?: string;
   profilePicture?: string;
+
+  // ✅ ADDED FIELDS
+  status?: string;
+  salary?: number;
+  dateOfBirth?: string;
 };
 
 export default function EmployeeProfile() {
@@ -51,7 +57,6 @@ export default function EmployeeProfile() {
     setLoading(false);
   };
 
-  // 🔥 MUST MATCH backend: profilePicture
   const uploadImage = async (file: File) => {
     try {
       setUploading(true);
@@ -59,7 +64,7 @@ export default function EmployeeProfile() {
       const token = localStorage.getItem("token");
 
       const formData = new FormData();
-      formData.append("profilePicture", file); // IMPORTANT
+      formData.append("profilePicture", file);
 
       const res = await axios.post(
         "http://localhost:5000/employee/upload-profile-picture",
@@ -100,7 +105,7 @@ export default function EmployeeProfile() {
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
 
-      {/* LEFT */}
+      {/* LEFT CARD */}
       <div className="bg-white shadow rounded-xl p-6 flex flex-col items-center">
 
         <div className="relative w-32 h-32">
@@ -116,7 +121,7 @@ export default function EmployeeProfile() {
             </div>
           )}
 
-          {/* + button */}
+          {/* UPLOAD BUTTON */}
           <label className="absolute bottom-1 right-1 bg-blue-600 text-white w-8 h-8 flex items-center justify-center rounded-full cursor-pointer">
             +
             <input
@@ -140,8 +145,9 @@ export default function EmployeeProfile() {
         <p className="text-gray-500">{data.designation}</p>
       </div>
 
-      {/* RIGHT */}
+      {/* RIGHT CARD */}
       <div className="md:col-span-2 bg-white shadow rounded-xl p-6">
+
         <ProfileRow icon={<Mail size={16} />} label="Email" value={data.email} />
         <ProfileRow icon={<Phone size={16} />} label="Phone" value={data.phoneNumber} />
         <ProfileRow icon={<Building2 size={16} />} label="Department" value={data.department} />
@@ -149,11 +155,17 @@ export default function EmployeeProfile() {
         <ProfileRow icon={<CalendarDays size={16} />} label="Joining Date" value={data.dateOfJoining} />
         <ProfileRow icon={<MapPin size={16} />} label="Address" value={data.address} />
         <ProfileRow icon={<Users size={16} />} label="Gender" value={data.gender} />
+
+        {/* ✅ ADDED FIELDS */}
+        <ProfileRow icon={<Briefcase size={16} />} label="Status" value={data.status} />
+        <ProfileRow icon={<Briefcase size={16} />} label="Salary" value={data.salary?.toString()} />
+        <ProfileRow icon={<CalendarDays size={16} />} label="Date of Birth" value={data.dateOfBirth} />
       </div>
     </div>
   );
 }
 
+/* ---------------- ROW COMPONENT ---------------- */
 function ProfileRow({
   icon,
   label,

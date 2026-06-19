@@ -4,12 +4,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Eye } from "lucide-react";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
-/* ---------------- BASE CONFIG ---------------- */
 const BASE_URL = "http://localhost:5000/admin";
 
-/* ---------------- AUTH HEADER ---------------- */
+/* ---------------- AUTH ---------------- */
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return {
@@ -17,19 +16,6 @@ const getAuthHeader = () => {
       Authorization: `Bearer ${token}`,
     },
   };
-};
-
-/* ---------------- API FUNCTIONS ---------------- */
-const getEmployees = async () => {
-  const res = await axios.get(`${BASE_URL}/employees`, getAuthHeader());
-  return res.data.employees;
-};
-
-const deleteEmployee = async (id: string) => {
-  return await axios.delete(
-    `${BASE_URL}/delete-employee/${id}`,
-    getAuthHeader()
-  );
 };
 
 /* ---------------- TYPE ---------------- */
@@ -40,38 +26,49 @@ type Employee = {
   department: string;
   role: string;
   status: "active" | "inactive";
+  profilePicture?: string;
 };
 
-/* ---------------- PAGE ---------------- */
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [search, setSearch] = useState("");
   const router = useRouter();
 
   /* FETCH */
-  const fetchData = async () => {
+  const fetchEmployees = async () => {
     try {
-      const data = await getEmployees();
-      setEmployees(data);
+      const res = await axios.get(
+        `${BASE_URL}/employees`,
+        getAuthHeader()
+      );
+
+      setEmployees(res.data.employees);
     } catch (err) {
-      console.error("Fetch error:", err);
+      console.log(err);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchEmployees();
   }, []);
 
   /* DELETE */
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this employee?")) return;
+    if (!confirm("Are you sure?")) return;
 
     try {
-      await deleteEmployee(id);
-      setEmployees((prev) => prev.filter((e) => e._id !== id));
+      await axios.delete(
+        `${BASE_URL}/delete-employee/${id}`,
+        getAuthHeader()
+      );
+
+      setEmployees((prev) =>
+        prev.filter((emp) => emp._id !== id)
+      );
+
+      toast.success("Employee deleted");
     } catch (err) {
-      console.error("Delete failed:", err);
-      toast.error("Failed to delete employee");
+      toast.error("Delete failed");
     }
   };
 
@@ -82,8 +79,18 @@ export default function EmployeesPage() {
       .includes(search.toLowerCase())
   );
 
+  /* IMAGE HELPER */
+  const getImageUrl = (path?: string) => {
+    if (!path) {
+      return "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    }
+
+    return `http://localhost:5000${path}`;
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Employees</h1>
@@ -99,7 +106,7 @@ export default function EmployeesPage() {
       {/* SEARCH */}
       <input
         className="w-full md:w-1/3 p-2 border rounded mb-4"
-        placeholder="Search by name, email or department..."
+        placeholder="Search..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
@@ -107,6 +114,7 @@ export default function EmployeesPage() {
       {/* TABLE */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <table className="w-full text-sm">
+
           <thead className="bg-gray-100 text-left">
             <tr>
               <th className="p-3">Employee</th>
@@ -121,11 +129,24 @@ export default function EmployeesPage() {
           <tbody>
             {filtered.map((emp) => (
               <tr key={emp._id} className="border-t">
-                <td className="p-3 font-medium">{emp.fullName}</td>
+
+                {/* NAME + IMAGE */}
+                <td className="p-3 flex items-center gap-3">
+                  <img
+                    src={getImageUrl(emp.profilePicture)}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+
+                  <span className="font-medium">
+                    {emp.fullName}
+                  </span>
+                </td>
+
                 <td>{emp.email}</td>
                 <td>{emp.department}</td>
                 <td>{emp.role}</td>
 
+                {/* STATUS */}
                 <td>
                   <span
                     className={`px-2 py-1 rounded text-xs ${
@@ -138,17 +159,17 @@ export default function EmployeesPage() {
                   </span>
                 </td>
 
+                {/* ACTIONS */}
                 <td className="flex gap-2 p-3">
-                  {/* EDIT */}
-                 <button
-  onClick={() => router.push(`/employees/${emp._id}`)}
-  className="text-green-600 hover:text-green-800"
->
-  <Eye size={20} />
-  </button>
+                  <button
+                    onClick={() =>
+                      router.push(`/employees/${emp._id}`)
+                    }
+                    className="text-green-600"
+                  >
+                    <Eye size={18} />
+                  </button>
 
-
-                  {/* DELETE */}
                   <button
                     onClick={() => handleDelete(emp._id)}
                     className="text-red-600"
@@ -159,6 +180,7 @@ export default function EmployeesPage() {
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
     </div>

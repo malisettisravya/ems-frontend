@@ -2,7 +2,7 @@
 
 import { useEffect, useState, ChangeEvent } from "react";
 import axios from "axios";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 /* ---------------- ENUM TYPES (MATCH BACKEND) ---------------- */
 type EmploymentType = "FULL_TIME" | "PART_TIME" | "INTERN";
@@ -99,7 +99,7 @@ export default function EmployeeProfile() {
     }
   };
 
-  /* ---------------- UI FIELD COMPONENT ---------------- */
+  /* ---------------- FIELD ---------------- */
   const renderField = (
     label: string,
     name: keyof Employee,
@@ -112,17 +112,17 @@ export default function EmployeeProfile() {
         <input
           type={type}
           name={name}
-          value={employee[name]}
+          value={employee[name] as any}
           onChange={handleChange}
           className="border p-2 rounded mt-1"
         />
       ) : (
-        <p className="mt-1 font-medium">{employee[name]}</p>
+        <p className="mt-1 font-medium">{employee[name] || "-"}</p>
       )}
     </div>
   );
 
-  /* ---------------- SELECT FIELD ---------------- */
+  /* ---------------- SELECT ---------------- */
   const renderSelect = (
     label: string,
     name: keyof Employee,
@@ -139,11 +139,13 @@ export default function EmployeeProfile() {
           className="border p-2 rounded mt-1"
         >
           {options.map((opt) => (
-            <option key={opt}>{opt}</option>
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
           ))}
         </select>
       ) : (
-        <p className="mt-1 font-medium">{employee[name]}</p>
+        <p className="mt-1 font-medium">{employee[name] || "-"}</p>
       )}
     </div>
   );
@@ -151,7 +153,7 @@ export default function EmployeeProfile() {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="bg-white p-6 rounded shadow max-w-5xl mx-auto">
-        
+
         {/* HEADER */}
         <div className="flex justify-between mb-6">
           <h2 className="text-xl font-semibold">My Profile</h2>
@@ -165,7 +167,7 @@ export default function EmployeeProfile() {
         </div>
 
         <div className="grid grid-cols-3 gap-6">
-          
+
           {/* LEFT CARD */}
           <div className="bg-gray-50 p-4 rounded text-center">
             <div className="w-24 h-24 mx-auto rounded-full bg-purple-200 flex items-center justify-center text-3xl">
@@ -174,11 +176,16 @@ export default function EmployeeProfile() {
 
             <h3 className="mt-4 font-bold">{employee.fullName}</h3>
             <p className="text-sm text-gray-500">{employee.designation}</p>
+
+            {/* ✅ ADDED ROLE */}
+            <p className="text-xs text-gray-400 mt-1">
+              Role: {employee.role || "-"}
+            </p>
           </div>
 
           {/* RIGHT FORM */}
           <div className="col-span-2 grid grid-cols-2 gap-4">
-            
+
             {renderField("Full Name", "fullName")}
             {renderField("Email", "email")}
             {renderField("Phone", "phoneNumber")}
@@ -202,9 +209,12 @@ export default function EmployeeProfile() {
               "HR",
             ])}
 
+            {/* STATUS */}
             {renderSelect("Status", "status", ["ACTIVE", "INACTIVE"])}
 
+            {/* SALARY */}
             {renderField("Salary", "salary", "number")}
+
             {renderField("Date of Birth", "dateOfBirth", "date")}
             {renderField("Address", "address")}
 
