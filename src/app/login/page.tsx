@@ -5,6 +5,7 @@ import axios from "axios";
 import {toast} from 'sonner';
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
 
 type FormData = {
   email: string;
@@ -101,7 +102,8 @@ if (role === "admin") {
               className="w-full border border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
             />
 
-           <div className="relative w-full">
+            {/* PASSWORD FIELD */}
+<div className="relative w-full">
   <input
     type={showPassword ? "text" : "password"}
     name="password"
@@ -119,6 +121,18 @@ if (role === "admin") {
     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
   </button>
 </div>
+
+{/* ✅ ADD THIS FORGOT PASSWORD LINK */}
+<div className="text-right">
+  <a
+    href="/forget-password"
+    className="text-sm text-indigo-600 hover:underline"
+  >
+    Forgot Password?
+  </a>
+</div>
+
+           
 
             <button
               disabled={loading}

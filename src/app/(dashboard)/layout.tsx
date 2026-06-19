@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
   Users,
   ClipboardList,
-  Settings,
   LogOut,
 } from "lucide-react";
 
@@ -14,8 +13,9 @@ import {
 type NavItemProps = {
   icon: React.ReactNode;
   label: string;
-  href: string;
+  href?: string;
   active?: boolean;
+  onClick?: () => void;
 };
 
 /* ---------------- Layout ---------------- */
@@ -25,6 +25,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter(); // ✅ FIXED
 
   const navigationItems = [
     { icon: <Home size={18} />, label: "Dashboard", href: "/dashboard" },
@@ -33,12 +34,18 @@ export default function AdminLayout({
     { icon: <ClipboardList size={18} />, label: "Attendance Overview", href: "/tasks" },
   ];
 
-  // Helper function to dynamically determine the correct header title
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/login"); // ✅ now works
+  };
+
   const getHeaderTitle = () => {
     if (pathname === "/dashboard") return "Welcome back, Admin 👋";
-    
-    // Find matching item in navigation list to get the clean label
-    const currentItem = navigationItems.find((item) => item.href === pathname);
+
+    const currentItem = navigationItems.find(
+      (item) => item.href === pathname
+    );
+
     return currentItem ? currentItem.label : "Admin Panel";
   };
 
@@ -61,43 +68,52 @@ export default function AdminLayout({
           ))}
         </nav>
 
+        {/* ✅ Logout Button */}
         <NavItem
           icon={<LogOut size={18} />}
           label="Logout"
-          href="/logout"
+          onClick={handleLogout}
         />
       </aside>
 
       {/* Main Area */}
       <div className="flex-1 ml-64 flex flex-col min-h-screen">
 
-        {/* Dynamic Header */}
         <header className="flex justify-between items-center p-6 bg-white border-b sticky top-0 z-0">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800">
-              {getHeaderTitle()}
-            </h2>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-800">
+            {getHeaderTitle()}
+          </h2>
         </header>
 
-        {/* Page Content */}
-        <main className="p-6 flex-1 bg-gray-50">{children}</main>
+        <main className="p-6 flex-1 bg-gray-50">
+          {children}
+        </main>
       </div>
     </div>
   );
 }
 
 /* ---------------- Sidebar Item ---------------- */
-function NavItem({ icon, label, href, active }: NavItemProps) {
+function NavItem({ icon, label, href, active, onClick }: NavItemProps) {
+  const baseClass = `flex items-center gap-3 px-3 py-2 rounded transition ${
+    active
+      ? "bg-blue-600 text-white"
+      : "text-gray-300 hover:bg-gray-800 hover:text-white"
+  }`;
+
+  // ✅ If onClick exists → render button (for logout)
+  if (onClick) {
+    return (
+      <button onClick={onClick} className={baseClass}>
+        {icon}
+        <span className="text-sm">{label}</span>
+      </button>
+    );
+  }
+
+  // ✅ Otherwise → normal link
   return (
-    <Link
-      href={href}
-      className={`flex items-center gap-3 px-3 py-2 rounded transition ${
-        active
-          ? "bg-blue-600 text-white"
-          : "text-gray-300 hover:bg-gray-800 hover:text-white"
-      }`}
-    >
+    <Link href={href || "#"} className={baseClass}>
       {icon}
       <span className="text-sm">{label}</span>
     </Link>
