@@ -27,6 +27,7 @@ const DESIGNATIONS = [
   'automation_tester',
   'product_manager',
   'blockchain_developer',
+  'devops',
 ];
 
 // Employment Type Enum

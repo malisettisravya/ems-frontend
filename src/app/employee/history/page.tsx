@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 
 interface LeaveRecord {
   id: string | number;
-  leaveType: string;
+  Reason: string;
   fromDate: string;
   toDate: string;
   days: number;
@@ -117,7 +117,7 @@ export default function LeaveHistory() {
         <table className="w-full text-left">
           <thead className="bg-gray-50">
             <tr>
-              <th className="p-3">Leave Type</th>
+              <th className="p-3">Reason</th>
               <th className="p-3">From</th>
               <th className="p-3">To</th>
               <th className="p-3 text-center">Days</th>
@@ -135,7 +135,7 @@ export default function LeaveHistory() {
             ) : (
               leaveData.map((leave, index) => (
                 <tr key={leave.id ?? index} className="border-t">
-                  <td className="p-3">{leave.leaveType}</td>
+                  <td className="p-3">{leave.reason}</td>
                   <td className="p-3">{leave.fromDate}</td>
                   <td className="p-3">{leave.toDate}</td>
                   <td className="p-3 text-center">{leave.days}</td>

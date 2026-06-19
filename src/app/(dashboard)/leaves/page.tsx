@@ -40,7 +40,7 @@ export default function LeaveRequestsPage() {
   const [loading, setLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState<
-    "all" | "pending" | "approved" | "rejected"
+    "all" | "pending" | "approved" | "reject"
   >("all");
   const [search, setSearch] = useState("");
   const [leaveType, setLeaveType] = useState("all");
@@ -75,7 +75,7 @@ export default function LeaveRequestsPage() {
   /* ---------------- UPDATE STATUS ---------------- */
   const updateStatus = async (
     id: string,
-    status: "approved" | "rejected"
+    status: "approved" | "reject"
   ) => {
     try {
       await axios.put(
@@ -113,7 +113,7 @@ export default function LeaveRequestsPage() {
     switch (s) {
       case "approved":
         return "bg-green-100 text-green-600";
-      case "rejected":
+      case "reject":
         return "bg-red-100 text-red-600";
       default:
         return "bg-yellow-100 text-yellow-600";
@@ -142,12 +142,12 @@ export default function LeaveRequestsPage() {
 
       {/* ---------------- TABS ---------------- */}
       <div className="flex gap-4 mb-4">
-        {["all", "pending", "approved", "rejected"].map((tab) => (
+        {["all", "pending", "approved", "reject"].map((tab) => (
           <button
             key={tab}
             onClick={() =>
               setActiveTab(
-                tab as "all" | "pending" | "approved" | "rejected"
+                tab as "all" | "pending" | "approved" | "reject"
               )
             }
             className={`px-4 py-2 rounded ${
@@ -204,7 +204,7 @@ export default function LeaveRequestsPage() {
   {filteredLeaves.map((leave) => {
     const isFinalized =
       leave.Leavestatus === "approved" ||
-      leave.Leavestatus === "rejected";
+      leave.Leavestatus === "reject";
 
     return (
       <tr key={leave._id} className="border-t">
@@ -246,7 +246,7 @@ export default function LeaveRequestsPage() {
           </button>
 
           <button
-            onClick={() => updateStatus(leave._id, "rejected")}
+            onClick={() => updateStatus(leave._id, "reject")}
             disabled={isFinalized}
             className="bg-red-500 text-white px-3 py-1 rounded disabled:opacity-40"
           >
