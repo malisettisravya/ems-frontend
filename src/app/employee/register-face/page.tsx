@@ -98,7 +98,7 @@ export default function RegisterFace() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-      <div className="bg-white shadow-xl rounded-2xl w-full max-w-4xl p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="bg-white shadow-xl rounded-2xl w-full max-w-4xl p-6 grid grid-cols-1 md:grid-cols-2 gap-6 -translate-y-20">
 
         {/* LEFT - CAMERA */}
         <div className="flex flex-col items-center">

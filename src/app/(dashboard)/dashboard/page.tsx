@@ -64,7 +64,6 @@ export default function DashboardPage() {
           axios.get(`${BASE_URL}/leaves/overview`, getAuthHeader()),
         ]);
 
-        /* -------- STATS -------- */
         const statsData = statsRes.data?.data || statsRes.data;
 
         setStats({
@@ -74,7 +73,6 @@ export default function DashboardPage() {
           completedTasks: statsData.completedTasks ?? 0,
         });
 
-        /* -------- LEAVE OVERVIEW -------- */
         const leaveApi = leaveRes.data?.data || leaveRes.data;
 
         setLeaveData({
@@ -82,7 +80,6 @@ export default function DashboardPage() {
           approved: leaveApi.approved ?? leaveApi.approvedLeaves ?? 0,
           rejected: leaveApi.rejected ?? leaveApi.rejectedLeaves ?? 0,
         });
-
       } catch (err) {
         console.error("Dashboard fetch error:", err);
       } finally {
@@ -127,36 +124,35 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f6fb] p-6">
+    <div className="min-h-screen p-6">
 
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
-
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-900 text-xl">
             Here’s what’s happening with your team today
           </p>
         </div>
 
-        <button className="bg-white shadow px-4 py-2 rounded text-sm text-gray-600">
+        <button className="bg-white shadow px-4 py-2 rounded text-l text-black">
           {formattedDate}
         </button>
       </div>
 
       {/* Top Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <Card title="Total Employees" value={stats.totalEmployees} />
-        <Card title="Pending Leaves" value={stats.pendingLeaves} />
-        <Card title="Approved Leaves" value={stats.approvedLeaves} />
-        <Card title="Completed Tasks" value={stats.completedTasks} />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+        <Card title="Total Employees" value={stats.totalEmployees} color="bg-blue-500/10" />
+        <Card title="Pending Leaves" value={stats.pendingLeaves} color="bg-yellow-500/10" />
+        <Card title="Approved Leaves" value={stats.approvedLeaves} color="bg-green-500/10" />
+        <Card title="Completed Tasks" value={stats.completedTasks} color="bg-purple-500/10" />
       </div>
 
       {/* Main Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         {/* Leave Overview */}
-        <div className="bg-white p-5 rounded-xl shadow">
-          <h2 className="font-semibold text-gray-700 mb-4">
+        <div className=" p-5 rounded-xl shadow">
+          <h2 className="font-semibold text-slate-900 mb-4">
             Leave Overview
           </h2>
 
@@ -164,7 +160,6 @@ export default function DashboardPage() {
             <div className="w-36 h-36 rounded-full border-[14px] border-blue-500 border-t-green-400 border-r-red-400 border-b-gray-300" />
           </div>
 
-          {/* ✅ FULLY DYNAMIC */}
           <div className="text-sm space-y-2 mt-4 text-gray-600">
             <p>🔵 Pending: {leaveData.pending}</p>
             <p>🟢 Approved: {leaveData.approved}</p>
@@ -172,27 +167,15 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Activity Panel */}
-        <div className="bg-white p-5 rounded-xl shadow md:col-span-2">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="font-semibold text-gray-700">
-              Recent Activities
-            </h2>
-            <button className="text-blue-500 text-sm">
-              View all
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            {activities.length > 0 ? (
-              activities.map((item, index) => (
-                <Activity key={index} {...item} />
-              ))
-            ) : (
-              <p className="text-gray-400 text-sm">
-                No activities found
-              </p>
-            )}
+        {/* Image Panel (ONLY IMAGE as you wanted) */}
+        <div className=" p-5 rounded-xl  md:col-span-2">
+          <div className="flex justify-center items-center h-72">
+            
+            <img
+              src="/admind.png"
+              alt="Admin Activity"
+              className="w-[480px] opacity-90 animate-float hover:scale-105 transition duration-300"
+            />
           </div>
         </div>
 
@@ -203,11 +186,13 @@ export default function DashboardPage() {
 
 /* ---------------- COMPONENTS ---------------- */
 
-function Card({ title, value }: any) {
+function Card({ title, value, color }: any) {
   return (
-    <div className="bg-white p-4 rounded-xl shadow">
-      <p className="text-gray-500 text-sm">{title}</p>
-      <h3 className="text-2xl font-bold text-gray-800">{value}</h3>
+    <div className={`p-7 rounded-xl shadow border border-black ${color}`}>
+      <div className="flex flex-col justify-start -mt-1">
+        <p className="text-gray-900 text-l font-medium mb-4">{title}</p>
+        <h3 className="text-2xl font-bold text-black">{value}</h3>
+      </div>
     </div>
   );
 }

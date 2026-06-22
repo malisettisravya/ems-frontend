@@ -32,7 +32,6 @@ export default function ApplyLeave() {
 
         setTotalLeaves(response.data.totalLeaves ?? 0);
       } catch (error: any) {
-        console.log("BALANCE ERROR 👉", error.response?.data);
         toast.error("Failed to load leave balance");
       } finally {
         setBalanceLoading(false);
@@ -83,7 +82,7 @@ export default function ApplyLeave() {
 
       await axios.post(
         "http://localhost:5000/leave/apply",
-        { fromDate, toDate, reason }, // ✅ no leaveType
+        { fromDate, toDate, reason },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -91,13 +90,11 @@ export default function ApplyLeave() {
 
       toast.success("Leave applied successfully!");
 
-      // Reset form
       setFromDate("");
       setToDate("");
       setReason("");
       setNumberOfDays(0);
     } catch (error: any) {
-      console.log("APPLY ERROR 👉", error.response?.data);
       toast.error(error.response?.data?.message?.[0] || "Failed to apply leave");
     } finally {
       setLoading(false);
@@ -105,92 +102,130 @@ export default function ApplyLeave() {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex items-center justify-center overflow-hidden">
-      <div className="w-[1100px] h-[550px] bg-white shadow-lg rounded-xl flex">
-        
-        {/* LEFT */}
-        <div className="w-2/3 p-6 border-r">
-          <h2 className="text-xl font-bold mb-4">Apply Leave</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="w-full h-[calc(100vh-80px)] flex items-center justify-center -mt-10">
+  <div className="w-full max-w-[1100px] h-[480px] flex gap-4">
+      
+      
+      {/* MAIN CONTAINER */}
+       <div className="w-full max-w-[1100px] h-[480px] flex gap-4">
+        {/* LEFT CARD */}
+        <div className="flex-1 bg-white rounded-xl shadow-md p-5 flex flex-col justify-between">
 
-            <div className="flex gap-3">
-              <input
-                type="date"
-                value={fromDate}
-                min={today}
-                required
-                onChange={(e) => setFromDate(e.target.value)}
-                className="w-1/2 border p-2 rounded"
-              />
+          {/* HEADER */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Request Time Off
+            </h2>
+            <div className="border-b mt-2 mb-4"></div>
 
-              <input
-                type="date"
-                value={toDate}
-                min={fromDate || today}
-                required
-                onChange={(e) => setToDate(e.target.value)}
-                className="w-1/2 border p-2 rounded"
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-3">
 
-            <input
-              readOnly
-              value={numberOfDays}
-              className="w-full border p-2 rounded bg-gray-100"
-            />
+              {/* DATE ROW */}
+              <div className="flex gap-3">
+                <div className="w-1/2">
+                  <label className="text-xs text-gray-500">Start Date</label>
+                  <input
+                    type="date"
+                    value={fromDate}
+                    min={today}
+                    onChange={(e) => setFromDate(e.target.value)}
+                    className="w-full mt-1 border border-gray-300 p-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
-            <textarea
-              value={reason}
-              required
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Enter reason"
-              className="w-full border p-2 rounded"
-              rows={4}
-            />
+                <div className="w-1/2">
+                  <label className="text-xs text-gray-500">End Date</label>
+                  <input
+                    type="date"
+                    value={toDate}
+                    min={fromDate || today}
+                    onChange={(e) => setToDate(e.target.value)}
+                    className="w-full mt-1 border border-gray-300 p-2 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
 
-            <div className="flex gap-3 mt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setFromDate("");
-                  setToDate("");
-                  setReason("");
-                  setNumberOfDays(0);
-                }}
-                className="px-4 py-2 border rounded"
-              >
-                Cancel
-              </button>
+              {/* DAYS */}
+              <div>
+                <label className="text-xs text-gray-500">Number of Days</label>
+                <input
+                  readOnly
+                  value={numberOfDays}
+                  className="w-full mt-1 bg-gray-100 border border-gray-200 p-2 rounded-md text-sm"
+                />
+              </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                {loading ? "Submitting..." : "Submit"}
-              </button>
-            </div>
-          </form>
+              {/* REASON */}
+              <div>
+                <label className="text-xs text-gray-500">Reason for Leave</label>
+                <textarea
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Please detail the reason for your leave..."
+                  rows={3}
+                  className="w-full mt-1 border border-gray-300 p-2 rounded-md text-sm resize-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* BUTTONS */}
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFromDate("");
+                    setToDate("");
+                    setReason("");
+                    setNumberOfDays(0);
+                  }}
+                  className="px-4 py-1.5 text-sm rounded-full border border-gray-300 hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-6 py-1.5 text-sm rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow"
+                >
+                  {loading ? "Submitting..." : "Submit"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="w-1/3 p-6 flex items-start">
-          <div className="w-full h-[400px] bg-gray-100 rounded-xl p-5 flex flex-col justify-center">
-            <h3 className="font-bold mb-4">Leave Balance</h3>
+        {/* RIGHT CARD */}
+        <div className="w-[280px] bg-white rounded-xl shadow-md p-4 flex flex-col justify-center items-center">
+          
 
-            {balanceLoading ? (
-              <p className="text-gray-500">Loading...</p>
-            ) : (
-              <div className="flex justify-between">
-                <span>Total Leaves</span>
-                <span className="font-semibold">{totalLeaves} Days</span>
-              </div>
-            )}
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">
+            Leave Dashboard
+          </h3>
+
+          <div className="w-[140px] h-[140px] rounded-full border-[10px] border-green-200 flex items-center justify-center relative">
+            
+            <div className="absolute w-[140px] h-[140px] rounded-full border-[10px] border-green-600 border-t-transparent rotate-45"></div>
+
+            <div className="text-center">
+              <p className="text-lg font-semibold">
+                {balanceLoading ? "--" : `${totalLeaves} / 20`}
+              </p>
+              <p className="text-[10px] text-gray-500">Days</p>
+            </div>
           </div>
+
+          <p className="text-xs text-gray-500 mt-3">
+            Your Available Leave:{" "}
+            <span className="font-medium text-gray-700">
+              {balanceLoading ? "--" : totalLeaves} Days
+            </span>
+          </p>
         </div>
 
       </div>
     </div>
+    </div>
+  
   );
 }

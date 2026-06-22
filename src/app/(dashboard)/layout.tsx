@@ -7,6 +7,7 @@ import {
   Users,
   ClipboardList,
   LogOut,
+  ShieldCheck, // ✅ added
 } from "lucide-react";
 
 /* ---------------- Types ---------------- */
@@ -25,18 +26,18 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter(); // ✅ FIXED
+  const router = useRouter();
 
   const navigationItems = [
-    { icon: <Home size={18} />, label: "Dashboard", href: "/dashboard" },
-    { icon: <Users size={18} />, label: "Employees", href: "/employees" },
-    { icon: <ClipboardList size={18} />, label: "Leave Requests", href: "/leaves" },
-    { icon: <ClipboardList size={18} />, label: "Attendance Overview", href: "/tasks" },
+    { icon: <Home size={25} />, label: "Dashboard", href: "/dashboard" },
+    { icon: <Users size={25} />, label: "Employees", href: "/employees" },
+    { icon: <ClipboardList size={25} />, label: "Leave Requests", href: "/leaves" },
+    { icon: <ClipboardList size={25} />, label: "Attendance Overview", href: "/tasks" },
   ];
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    router.push("/login"); // ✅ now works
+    router.push("/login");
   };
 
   const getHeaderTitle = () => {
@@ -68,9 +69,8 @@ export default function AdminLayout({
           ))}
         </nav>
 
-        {/* ✅ Logout Button */}
         <NavItem
-          icon={<LogOut size={18} />}
+          icon={<LogOut size={25} />}
           label="Logout"
           onClick={handleLogout}
         />
@@ -79,10 +79,17 @@ export default function AdminLayout({
       {/* Main Area */}
       <div className="flex-1 ml-64 flex flex-col min-h-screen">
 
+        {/* HEADER */}
         <header className="flex justify-between items-center p-6 bg-white border-b sticky top-0 z-0">
           <h2 className="text-2xl font-bold text-gray-800">
             {getHeaderTitle()}
           </h2>
+
+          {/* ✅ ADMIN BADGE (RIGHT SIDE) */}
+          <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full">
+            <ShieldCheck size={18} />
+            <span className="text-sm font-medium">Admin</span>
+          </div>
         </header>
 
         <main className="p-6 flex-1 bg-gray-50">
@@ -101,21 +108,19 @@ function NavItem({ icon, label, href, active, onClick }: NavItemProps) {
       : "text-gray-300 hover:bg-gray-800 hover:text-white"
   }`;
 
-  // ✅ If onClick exists → render button (for logout)
   if (onClick) {
     return (
       <button onClick={onClick} className={baseClass}>
         {icon}
-        <span className="text-sm">{label}</span>
+        <span className="text-l">{label}</span>
       </button>
     );
   }
 
-  // ✅ Otherwise → normal link
   return (
     <Link href={href || "#"} className={baseClass}>
       {icon}
-      <span className="text-sm">{label}</span>
+      <span className="text-l">{label}</span>
     </Link>
   );
 }

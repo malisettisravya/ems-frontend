@@ -6,7 +6,7 @@ import axios from "axios";
 type Attendance = {
   date: string;
   status: "PRESENT" | "LEAVE";
-  checkInTime?: string; // ✅ added
+  checkInTime?: string; 
   employeeId: {
     fullName: string;
   };

@@ -136,62 +136,89 @@ export default function AttendancePage() {
   // -----------------------------
   // UI
   // -----------------------------
-  return (
-    <div className="min-h-screen bg-gray-100">
+ return (
+  <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col">
 
-      {/* Header */}
-      <header className="bg-white border-b px-6 py-4 flex justify-between items-center">
-        <h1 className="text-lg font-semibold text-gray-800">
-          Employee Attendance
-        </h1>
-        <span className="text-sm text-gray-500">
-          Face Recognition System
-        </span>
-      </header>
+    {/* Header */}
+    <header className="flex justify-between items-center px-8 py-5 bg-white/70 backdrop-blur-md border-b shadow-sm">
+      <h1 className="text-xl font-semibold text-gray-800 tracking-tight">
+        Employee Attendance
+      </h1>
+      <span className="text-lg text-black font-medium">
+        Face Recognition System
+      </span>
+    </header>
 
-      {/* Main */}
-      <main className="flex justify-center items-center py-10 px-4">
-        <div className="bg-white w-full max-w-lg border rounded-lg shadow-sm p-6">
+    {/* Main */}
+    <main className="flex flex-1 items-center justify-center px-4 py-10 -mt-6">
+      <div className="w-full max-w-md">
 
-          <h2 className="text-md font-medium text-gray-700 mb-4">
+        {/* Card */}
+        <div className="bg-white/80 backdrop-blur-lg border border-gray-200 rounded-2xl shadow-xl p-6   -translate-y-10">
+
+          {/* Title */}
+          <h2 className="text-lg font-semibold text-gray-800 mb-5 ">
             Mark Attendance
           </h2>
+          <p className="text-sm text-black mb-5">
+            Position your face clearly in the frame
+          </p>
 
-          {/* Camera */}
-          <div className="border rounded-md overflow-hidden bg-black mb-4">
+          {/* Camera Frame */}
+          <div className="relative rounded-xl overflow-hidden border bg-black mb-5 group">
             <video
               ref={videoRef}
               autoPlay
               muted
               playsInline
-              className="w-full h-auto"
+              className="w-full h-auto object-cover"
             />
+
+            {/* Overlay */}
+            <div className="absolute inset-0 border-2 border-dashed border-white/40 rounded-xl pointer-events-none group-hover:border-blue-400 transition" />
+
+            {/* Status Dot */}
+            <div className="absolute top-3 right-3 flex items-center gap-2 bg-black/60 px-2 py-1 rounded-full text-xs text-white">
+              <span className={`w-2 h-2 rounded-full ${
+                ready ? "bg-green-400 animate-pulse" : "bg-gray-400"
+              }`} />
+              {ready ? "Ready" : "Loading"}
+            </div>
           </div>
 
           {/* Button */}
           <button
             onClick={markAttendance}
             disabled={!ready}
-            className={`w-full py-2.5 text-sm font-medium rounded-md transition
+            className={`w-full py-3 rounded-xl font-medium text-sm transition-all duration-200
               ${
                 ready
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
-                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  ? "bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white shadow-md"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }
             `}
           >
-            Mark Attendance
+            {ready ? "Scan & Mark Attendance" : "Initializing..."}
           </button>
 
-          {/* Status (only when needed) */}
+          {/* Status */}
           {status && (
-            <p className={`mt-4 text-sm ${getStatusColor()}`}>
-              {status}
-            </p>
+            <div className="mt-4 text-center">
+              <p className={`text-sm font-medium ${getStatusColor()}`}>
+                {status}
+              </p>
+            </div>
           )}
 
         </div>
-      </main>
-    </div>
-  );
+
+        {/* Footer Note */}
+        <p className="text-center text-m text-black ">
+          Ensure proper lighting for accurate detection
+        </p>
+
+      </div>
+    </main>
+  </div>
+);
 }

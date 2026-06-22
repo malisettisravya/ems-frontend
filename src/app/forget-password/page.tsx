@@ -28,7 +28,6 @@ export default function ForgotPassword() {
       alert("Reset link sent to your email ✅");
        setEmail("");
 
-      // 🔥 ONLY FOR TESTING (remove in production)
       if (res.data.token) {
         setToken(res.data.token);
       }
