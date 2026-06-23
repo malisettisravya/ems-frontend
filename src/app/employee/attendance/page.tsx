@@ -66,7 +66,7 @@ export default function AttendancePage() {
           videoRef.current,
           new faceapi.TinyFaceDetectorOptions({
             inputSize: 320,
-            scoreThreshold: 0.5,
+            scoreThreshold: 0.45,
           })
         )
         .withFaceLandmarks()
