@@ -62,7 +62,9 @@ export default function DashboardPage() {
         const [statsRes, leaveRes] = await Promise.all([
           axios.get(`${BASE_URL}/dashboard`, getAuthHeader()),
           axios.get(`${BASE_URL}/leaves/overview`, getAuthHeader()),
+          
         ]);
+        
 
         const statsData = statsRes.data?.data || statsRes.data;
 
