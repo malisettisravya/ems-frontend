@@ -52,49 +52,49 @@ export default function RegisterFace() {
     toast.success("Face captured successfully ✅");
   }; 
   const registerFace = async () => {
-    if (!descriptor) {
-      toast.error("Please capture face first");
-      return;
-    }
+  if (!descriptor) {
+    toast.error("Please capture face first");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const token = localStorage.getItem("token");
+  try {
+    const token = localStorage.getItem("token");
 
-      const canvas = document.createElement("canvas");
-      canvas.width = videoRef.current!.videoWidth;
-      canvas.height = videoRef.current!.videoHeight;
+    // 1. Capture image from video
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current!.videoWidth;
+    canvas.height = videoRef.current!.videoHeight;
 
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(videoRef.current!, 0, 0);
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(videoRef.current!, 0, 0);
 
-      const blob = await new Promise<Blob>((resolve) =>
-        canvas.toBlob((b) => resolve(b!), "image/jpeg")
-      );
+    // 2. Convert image to Base64 (this becomes imageUrl)
+    const imageUrl = canvas.toDataURL("image/jpeg");
 
-      const formData = new FormData();
-      formData.append("image", blob, "face.jpg");
-      formData.append("faceDescriptor", JSON.stringify(descriptor));
-
-      await api.post("/employee/register-face", formData, {
+    // 3. Send to backend (NO S3, NO KEY)
+    await api.post(
+      "/employee/register-face",
+      {
+        imageUrl,
+        faceDescriptor: descriptor,
+      },
+      {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
         },
-      });
+      }
+    );
 
-      toast.success("Face registered successfully 🎉"); 
-      setDescriptor(null);
-    }catch (err: any) {
-      const message =
-        err.response?.data?.message 
-
-      toast.error(message);
-    }
-
+    toast.success("Face registered successfully 🎉");
+    setDescriptor(null);
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || "Error");
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">

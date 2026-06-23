@@ -24,9 +24,7 @@ type Employee = {
   dateOfJoining: string;
   address?: string;
   gender?: string;
-  employeeId?: string;
   profilePicture?: string;
-
   status?: string;
   salary?: number;
   dateOfBirth?: string;
@@ -37,41 +35,53 @@ export default function EmployeeProfile() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    const token = localStorage.getItem("token");
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
     const res = await axios.get("http://localhost:5000/employee/profile", {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    setData(res.data.employee);
-    setLoading(false);
-  };
+    console.log("PROFILE DATA:", res.data.employee);
 
-  const uploadImage = async (file: File) => {
-    try {
-      setUploading(true);
+    setData(res.data.employee);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  /* ---------------- UPLOAD IMAGE ---------------- */
+ const uploadImage = async (file: File) => {
+  try {
+    setUploading(true);
 
       const token = localStorage.getItem("token");
       const formData = new FormData();
       formData.append("profilePicture", file);
 
-      const res = await axios.post(
-        "http://localhost:5000/employee/upload-profile-picture",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+    const res = await axios.post(
+      "http://localhost:5000/employee/upload-profile-picture",
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
-      const newPath = res.data.profilePicture;
+    setData((prev) =>
+      prev
+        ? {
+            ...prev,
+            profilePicture: res.data.profilePicture,
+          }
+        : prev
+    );
 
       setData((prev) =>
         prev
@@ -86,9 +96,8 @@ export default function EmployeeProfile() {
   if (loading) return <div className="p-6">Loading...</div>;
   if (!data) return <div className="p-6">No data found</div>;
 
-  const imageUrl = data.profilePicture
-    ? `http://localhost:5000${data.profilePicture}`
-    : "";
+  /* ---------------- IMAGE URL ---------------- */
+  const imageUrl = data.profilePicture || null;
 
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
@@ -162,27 +171,17 @@ export default function EmployeeProfile() {
             <Info icon={<CalendarDays size={16} />} label="Joining Date" value={data.dateOfJoining} />
           </Section>
 
-          {/* Personal */}
-          <Section title="Personal Info">
-            <Info icon={<Users size={16} />} label="Gender" value={data.gender} />
-            <Info icon={<CalendarDays size={16} />} label="Date of Birth" value={data.dateOfBirth} />
-          </Section>
+        <ProfileRow icon={<Mail size={16} />} label="Email" value={data.email} />
+        <ProfileRow icon={<Phone size={16} />} label="Phone" value={data.phoneNumber} />
+        <ProfileRow icon={<Building2 size={16} />} label="Department" value={data.department} />
+        <ProfileRow icon={<Briefcase size={16} />} label="Designation" value={data.designation} />
+        <ProfileRow icon={<CalendarDays size={16} />} label="Joining Date" value={data.dateOfJoining} />
+        <ProfileRow icon={<MapPin size={16} />} label="Address" value={data.address} />
+        <ProfileRow icon={<Users size={16} />} label="Gender" value={data.gender} />
+        <ProfileRow icon={<Briefcase size={16} />} label="Status" value={data.status} />
+        <ProfileRow icon={<Briefcase size={16} />} label="Salary" value={data.salary?.toString()} />
+        <ProfileRow icon={<CalendarDays size={16} />} label="Date of Birth" value={data.dateOfBirth} />
 
-          {/* Compensation */}
-          <Section title="Compensation">
-            <Info
-              icon={<BadgeIndianRupee size={16} />}
-              label="Salary"
-              value={data.salary ? `₹${data.salary}` : "-"}
-            />
-            <Info
-              icon={<UserCheck size={16} />}
-              label="Status"
-              value={data.status}
-            />
-          </Section>
-
-        </div>
       </div>
     </div>
   );
