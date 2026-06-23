@@ -11,8 +11,6 @@ import {
   CalendarDays,
   MapPin,
   Users,
-  BadgeIndianRupee,
-  UserCheck,
 } from "lucide-react";
 
 type Employee = {
@@ -35,59 +33,64 @@ export default function EmployeeProfile() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  /* ---------------- FETCH PROFILE ---------------- */
+  const fetchProfile = async () => {
+    try {
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("token")
+          : null;
 
-    const res = await axios.get("http://localhost:5000/employee/profile", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      const res = await axios.get(
+        "http://localhost:5000/employee/profile",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-    console.log("PROFILE DATA:", res.data.employee);
+      console.log("PROFILE DATA:", res.data.employee);
+      setData(res.data.employee);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setData(res.data.employee);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
   useEffect(() => {
     fetchProfile();
   }, []);
 
   /* ---------------- UPLOAD IMAGE ---------------- */
- const uploadImage = async (file: File) => {
-  try {
-    setUploading(true);
+  const uploadImage = async (file: File) => {
+    try {
+      setUploading(true);
 
       const token = localStorage.getItem("token");
       const formData = new FormData();
       formData.append("profilePicture", file);
 
-    const res = await axios.post(
-      "http://localhost:5000/employee/upload-profile-picture",
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    setData((prev) =>
-      prev
-        ? {
-            ...prev,
-            profilePicture: res.data.profilePicture,
-          }
-        : prev
-    );
+      const res = await axios.post(
+        "http://localhost:5000/employee/upload-profile-picture",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       setData((prev) =>
         prev
-          ? { ...prev, profilePicture: `${newPath}?t=${Date.now()}` }
+          ? {
+              ...prev,
+              profilePicture: res.data.profilePicture,
+            }
           : prev
       );
+    } catch (error) {
+      console.error(error);
     } finally {
       setUploading(false);
     }
@@ -96,14 +99,13 @@ export default function EmployeeProfile() {
   if (loading) return <div className="p-6">Loading...</div>;
   if (!data) return <div className="p-6">No data found</div>;
 
-  /* ---------------- IMAGE URL ---------------- */
   const imageUrl = data.profilePicture || null;
 
   return (
     <div className="p-6 bg-slate-50 min-h-screen">
       <div className="max-w-5xl mx-auto space-y-6">
 
-        {/* ===== HEADER CARD ===== */}
+        {/* HEADER */}
         <div className="bg-white shadow-md rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6">
 
           <div className="relative">
@@ -125,13 +127,17 @@ export default function EmployeeProfile() {
                 className="hidden"
                 accept="image/*"
                 onChange={(e) => {
-                  if (e.target.files?.[0]) uploadImage(e.target.files[0]);
+                  if (e.target.files?.[0]) {
+                    uploadImage(e.target.files[0]);
+                  }
                 }}
               />
             </label>
 
             {uploading && (
-              <p className="text-xs text-indigo-500 mt-2">Uploading...</p>
+              <p className="text-xs text-indigo-500 mt-2">
+                Uploading...
+              </p>
             )}
           </div>
 
@@ -154,40 +160,28 @@ export default function EmployeeProfile() {
           </div>
         </div>
 
-        {/* ===== INFO GRID ===== */}
+        {/* INFO GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          {/* Contact */}
           <Section title="Contact Information">
             <Info icon={<Mail size={16} />} label="Email" value={data.email} />
             <Info icon={<Phone size={16} />} label="Phone" value={data.phoneNumber} />
             <Info icon={<MapPin size={16} />} label="Address" value={data.address} />
           </Section>
 
-          {/* Work */}
           <Section title="Work Details">
             <Info icon={<Building2 size={16} />} label="Department" value={data.department} />
             <Info icon={<Briefcase size={16} />} label="Designation" value={data.designation} />
             <Info icon={<CalendarDays size={16} />} label="Joining Date" value={data.dateOfJoining} />
           </Section>
 
-        <ProfileRow icon={<Mail size={16} />} label="Email" value={data.email} />
-        <ProfileRow icon={<Phone size={16} />} label="Phone" value={data.phoneNumber} />
-        <ProfileRow icon={<Building2 size={16} />} label="Department" value={data.department} />
-        <ProfileRow icon={<Briefcase size={16} />} label="Designation" value={data.designation} />
-        <ProfileRow icon={<CalendarDays size={16} />} label="Joining Date" value={data.dateOfJoining} />
-        <ProfileRow icon={<MapPin size={16} />} label="Address" value={data.address} />
-        <ProfileRow icon={<Users size={16} />} label="Gender" value={data.gender} />
-        <ProfileRow icon={<Briefcase size={16} />} label="Status" value={data.status} />
-        <ProfileRow icon={<Briefcase size={16} />} label="Salary" value={data.salary?.toString()} />
-        <ProfileRow icon={<CalendarDays size={16} />} label="Date of Birth" value={data.dateOfBirth} />
-
+        </div>
       </div>
     </div>
   );
 }
 
-/* ===== SECTION CARD ===== */
+/* ---------------- SECTION COMPONENT ---------------- */
 function Section({
   title,
   children,
@@ -205,7 +199,7 @@ function Section({
   );
 }
 
-/* ===== INFO ROW ===== */
+/* ---------------- INFO COMPONENT ---------------- */
 function Info({
   icon,
   label,

@@ -80,13 +80,19 @@ export default function EmployeesPage() {
   );
 
   /* IMAGE HELPER */
-  const getImageUrl = (path?: string) => {
-    if (!path) {
-      return "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-    }
+const getImageUrl = (path?: string) => {
+  if (!path) {
+    return "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+  }
 
-    return `http://localhost:5000${path}`;
-  };
+  // If already a full URL (Cloudinary / S3 / external)
+  if (path.startsWith("http")) {
+    return path;
+  }
+
+  // If it's backend static file
+  return `http://localhost:5000${path}`;
+};
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
