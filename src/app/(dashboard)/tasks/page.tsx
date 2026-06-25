@@ -122,7 +122,14 @@ Attendance Records </h2>
             </td>
 
             <td className="p-2">
-              {emp.checkInTime || "Not Checked In"}
+              {emp.checkInTime
+                ? new Date(emp.checkInTime).toLocaleTimeString("en-IN", {
+                    timeZone: "Asia/Kolkata",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })
+                : "Not Checked In"}
             </td>
           </tr>
         ))
