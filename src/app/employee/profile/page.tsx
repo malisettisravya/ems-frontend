@@ -68,7 +68,7 @@ export default function EmployeeProfile() {
 
       const token = localStorage.getItem("token");
       const formData = new FormData();
-      formData.append("profilePicture", file);
+      formData.append("file", file);
 
       const res = await axios.post(
         "https://ems-backend-lac.vercel.app/employee/upload-profile-picture",
