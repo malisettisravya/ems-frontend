@@ -48,12 +48,7 @@ localStorage.setItem("employeeName", response.data.name);
 
 const role = response.data.role;
 const name = response.data.name;
-// ✅ Toast here
-toast(
-  role === "admin"
-    ? "Welcome Admin "
-    : "Welcome Employee"
-);
+
 
 // ✅ Redirect
 if (role === "admin") {
